@@ -69,9 +69,7 @@ while coin == 0 :
     if Play == "y":
         coin = 1500
         play()
-
-        while coin > minimum and coin < maximum :
-            correct = random.choice(["heads", "tails"])
+        while coin > minimum and coin < maximum : 
             if choice is None:
                 choice = input(f'Guess heads or tails using "heads" or "tails". : ')
             if choice == "heads" or choice == "tails":
@@ -88,6 +86,7 @@ while coin == 0 :
                         continue
                     bet = int(bet)
                     print()
+                    correct = random.choice(["heads", "tails"])
                     if bet <= coin :
                         if correct == "heads":
                             HEAD()
