@@ -1,18 +1,18 @@
 import random
-
-coin = 0
-coin_player2 = 1500
-choice = None
+import time
 minimum = 1000
 maximum = 2000
+coin = 0
+coin_player2 = 0
+choice = None
+choice_player2 = None
 Win_Multiply = 1
 lose_Multipay = 1
-count_wins_player1 = 0
-count_losses_player1 = 0
-count_wins_player2 = 0
-count_losses_player2 = 0
-score_player1 = 0
-score_player2 = 0
+num_players = 0
+Name_player1 = None
+Name_player2 = None
+lastchoice_player1 = "heads"
+lastchoice_player2 = "heads"
 def hint():
     print ("+------------------------------------------------------------------------------------------+")
     print ("|                      Welcome to the head or tails guessing game.                         |")
@@ -68,23 +68,22 @@ def LV_Detil():
     print ("|  IN A Easy                 Game.         |        2       |       0.5       |      2000     |     1000      |")
     print ("|  IN A Medium               Game.         |        1       |        1        |      3000     |     1000      |")
     print ("|  IN A Hard                 Game.         |        1       |        2        |      3000     |     1000      |")
-    print ("|  IN A Don't make mistakes  Game.         |        1       |       10        |     10000     |     1000      |")
+    print ("|  IN A Don't make mistakes  Game.         |        1       |      10000      |     10000     |     1000      |")
     print ("|                                                                                                             |")
     print ("|                                    Good luck, have fun with the game.                                       |")
     print ("+-------------------------------------------------------------------------------------------------------------+\n")
-
-
 def play_player2():
     print ("\n\n-------------------------------")
     print ("-        heads or tails       -")
     print ("-------------------------------\n\n")
     print ('coins player 2 has: ', coin_player2, "$\n")
 def play_turn_player2():
-    global coin_player2
-    choice_player2 = input(f'Player 2, guess heads or tails using "heads" or "tails": ')
+    global coin_player2, choice_player2
+    if choice_player2 is None:
+        choice_player2 = input(f'{Name_player2}, guess heads or tails using "heads" or "tails": ')
     if choice_player2 == "heads" or choice_player2 == "tails":
         try:
-            bet_player2 = int(input(f'Player 2, enter the amount to bet: '))
+            bet_player2 = int(input(f'{Name_player2}, enter the amount to bet: '))
             if bet_player2 <= coin_player2:
                 print()
                 correct_player2 = random.choice(["heads", "tails"])
@@ -97,24 +96,103 @@ def play_turn_player2():
                     print("★   ℂ 𝕆 ℝ ℝ 𝔼 ℂ 𝕋   ★")
                     print("★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★\n")
                     coin_player2 += bet_player2
-                    print('coins player 2 has: ', coin_player2, "$\n")
+                    print(f'coins {Name_player2} has: ', coin_plaer2, "$\n")
+                    choice_player2 = None
+                    choice = None
                 elif correct_player2 != choice_player2:
                     print("\n✪ ✪ ✪ ✪ ✪ ✪ ✪ ✪ ✪ ✪ ✪ ✪")
                     print("✪   𝕐 𝕆 𝕌   𝕄 𝕀 𝕊 𝕊   ✪")
                     print("✪ ✪ ✪ ✪ ✪ ✪ ✪ ✪ ✪ ✪ ✪ ✪\n")
                     coin_player2 -= bet_player2
-                    print('coins player 2 has: ', coin_player2, "$\n")
+                    print(f'coins {Name_player2} has: ', coin_player2, "$\n")
+                    choice_player2 = None
+                    choice = None
             else:
-                print("Player 2's coin is: ", coin_player2, "$")
+                print(f"{Name_player2} coin is: ", coin_player2, "$")
         except ValueError:
             print('Please enter a valid "number" bet.')
     else:
-        print('Player 2, please enter "heads" or "tails" only.\n ')
+        print(f'{Name_player2}, please enter "heads" or "tails" only.\n ')
 
 def play_turn():
-    global coin, choice
+    global coin, choice , elapsed_time
     if choice is None:
-        choice = input(f'Guess heads or tails using "heads" or "tails". : ')
+        start_time = time.time()
+        elapsed_time = 0
+        correct = random.choice(["heads", "tails"])
+        print('You have 15 seconds to make your guess...')
+        while elapsed_time == 0:
+            try :
+                choice = input(f'Guess heads or tails using "heads" or "tails". : ')
+
+                if choice.lower() in ["heads", "tails"]:
+                    elapsed_time = time.time() - start_time
+                    if elapsed_time >= 15:
+                        choice = lastchoice_player1
+                        continue
+                    else:
+                        print(f'Time remaining: {15 - elapsed_time:.2f} seconds')
+                        pass
+            except ValueError:
+                print('Please enter "heads" or "tails" only.')
+        try :
+            bet = int(input(f'Place your bet: '))
+            if bet <= coin:
+                elapsed_time = time.time() - start_time
+                if elapsed_time >= 15:
+                    bet = coin
+                else:
+                    print(f'Time remaining: {15 - elapsed_time:.2f} seconds')
+                    pass
+                
+            else:
+                print(f'{Name_player1} coin is: ', coin, "$")
+
+        except ValueError:
+            print('Please enter a valid "number" bet.')
+    if elapsed_time <= 15:
+        if correct == choice:
+            print("\n★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★")
+            print("★   ℂ 𝕆 ℝ ℝ 𝔼 ℂ 𝕋   ★")
+            print("★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★\n")
+            coin += (bet * Win_Multiply)
+            print('coins you have : ', coin, "$\n")
+            choice_player2 = None
+            choice = None
+        elif correct != choice:
+            print("\n✪ ✪ ✪ ✪ ✪ ✪ ✪ ✪ ✪ ✪ ✪ ✪")
+            print("✪   𝕐 𝕆 𝕌   𝕄 𝕀 𝕊 𝕊   ✪")
+            print("✪ ✪ ✪ ✪ ✪ ✪ ✪ ✪ ✪ ✪ ✪ ✪\n")
+            coin -= (bet * lose_Multipay)
+            print('coins you have : ', coin, "$\n")
+            choice_player2 = None
+            choice = None
+    elif elapsed_time > 15:
+        if correct == choice:
+            print("\n★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★")
+            print("★   ℂ 𝕆 ℝ ℝ 𝔼 ℂ 𝕋   ★")
+            print("★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★\n")
+            coin += (bet * Win_Multiply)
+            print('coins you have : ', coin, "$\n")
+            choice_player2 = None
+            choice = None
+        elif correct != choice:
+            print("\n✪ ✪ ✪ ✪ ✪ ✪ ✪ ✪ ✪ ✪ ✪ ✪")
+            print("✪   𝕐 𝕆 𝕌   𝕄 𝕀 𝕊 𝕊   ✪")
+            print("✪ ✪ ✪ ✪ ✪ ✪ ✪ ✪ ✪ ✪ ✪ ✪\n")
+            coin -= (bet * lose_Multipay)
+            print('coins you have : ', coin, "$\n")
+            choice_player2 = None
+            choice = None
+""""  print('Time is up! Your guess is not accepted.\n')
+      elif correct != choice:
+            print("\n✪ ✪ ✪ ✪ ✪ ✪ ✪ ✪ ✪ ✪ ✪ ✪")
+            print("✪   𝕐 𝕆 𝕌   𝕄 𝕀 𝕊 𝕊   ✪")
+            print("✪ ✪ ✪ ✪ ✪ ✪ ✪ ✪ ✪ ✪ ✪ ✪\n")
+            coin -= (bet * lose_Multipay)
+            print('coins you have : ', coin, "$\n")
+            choice_player2 = None
+            choice = None
     if choice == "heads" or choice == "tails":
         try:
             bet = int(input(f'Price to bet : '))
@@ -131,14 +209,18 @@ def play_turn():
                     print("★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★\n")
                     coin += (bet * Win_Multiply)
                     print('coins you have : ', coin, "$\n")
+                    choice_player2 = None
                     choice = None
+
                 elif correct != choice:
                     print("\n✪ ✪ ✪ ✪ ✪ ✪ ✪ ✪ ✪ ✪ ✪ ✪")
                     print("✪   𝕐 𝕆 𝕌   𝕄 𝕀 𝕊 𝕊   ✪")
                     print("✪ ✪ ✪ ✪ ✪ ✪ ✪ ✪ ✪ ✪ ✪ ✪\n")
                     coin -= (bet * lose_Multipay)
                     print('coins you have : ', coin, "$\n")
+                    choice_player2 = None
                     choice = None
+
             else:
                 print("Your coin is : ", (coin), "$")
         except ValueError:
@@ -147,48 +229,61 @@ def play_turn():
         TY()
     elif choice == "hint":
         hint()
-        choice = None
+
     else:
-        print('Please enter "heads" or "tails" only.\n ')
-        choice = None
+        print('Please enter "heads" or "tails" only.\n ')"""
 
+while num_players not in [1, 2]:
+    num_players_input = input('Enter the number of players (1 or 2): ')
+    try:
+        num_players = int(num_players_input)
+    except ValueError:
+        print('Please enter a valid number (1 or 2).')
 
-    
-    print(f"Player 1: Wins {count_wins_player1}, Losses {count_losses_player1}")
-    print(f"Player 2: Wins {count_wins_player2}, Losses {count_losses_player2}\n")
-    
-    print(f"Current Scores - Player 1: {coin}, Player 2: {coin_player2}\n")
 print ("\n\nWelcome to the head or tails guessing game.\n")
-while coin == 0:
-    Play = input(f'Do you want to play the game? y/n : ')
+
+while num_players in [1, 2]:
+    Play = input('Do you want to play the game? (y/n): ')
     if Play == "y":
-        coin = 1500
+
+        if num_players == 1:
+            Name_player1 = input('player 1, Enter your name: ')
+            coin = 1500
+            coin_player2 = 1500
+        elif num_players == 2:
+            Name_player1 = input('player 1, Enter your name: ')
+            Name_player2 = input('player 2, Enter your name: ')
+            coin = 1500
+            coin_player2 = 1500
+        
         play()
 
         while coin > minimum and coin < maximum and coin_player2 > minimum and coin_player2 < maximum:
-            play_turn()
-            play_turn_player2()
-    
-        if coin <= minimum or coin >= maximum:
-            if coin == coin_player2:
-                print("It's a draw!\n")
+            if num_players == 1:
+                play_turn()
+            elif num_players == 2:
+                if choice_player2 is None:
+                    play_turn()
+                if choice is None:    
+                    play_turn_player2()
+        if num_players == 1:
+            if coin <= minimum :
+                print(f"{Name_player1} loses!\n")
+                break
+            elif coin >= maximum:
+                print(f"{Name_player1}, Wins!\n")
+            print(f"Current Scores - {Name_player1}: {coin}\n")
+            break
+        elif num_players == 2:
+            if coin > coin_player2:
+                print(f"{Name_player1} is the overall winner!")
+            elif coin < coin_player2:
+                print(f"{Name_player2} is the overall winner!")
             else:
-                print(f"Player {1 if coin > coin_player2 else 2} Wins!\n")
-                if coin <= minimum:
-                    count_wins_player2 += 1
-                    count_losses_player1 += 1
-                elif coin >= maximum:
-                    count_wins_player1 += 1
-                    count_losses_player2 += 1
-        
-        if coin > coin_player2:
-            print("Player 1 is the overall winner!")
-        elif coin < coin_player2:
-            print("Player 2 is the overall winner!")
-        else:
-            print("It's a tie in the overall score!")
+                print("It's a draw!\n")
+            print(f"Current Scores - {Name_player1}:{coin}, {Name_player2}: {coin_player2}\n")
+            break
+    elif Play == "n":
         break
-print(f"Player 1: Wins {count_wins_player1}, Losses {count_losses_player1}")
-print(f"Player 2: Wins {count_wins_player2}, Losses {count_losses_player2}\n")
-    
-print(f"Current Scores - Player 1: {coin}, Player 2: {coin_player2}\n")
+    else:
+        print('Please enter "y" or "n" only.\n')
